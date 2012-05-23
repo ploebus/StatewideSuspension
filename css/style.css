@@ -1,0 +1,242 @@
+
+
+.shadow {
+	-moz-box-shadow:    3px 3px 5px 6px #ccc;
+	-webkit-box-shadow: 3px 3px 5px 6px #ccc;
+	box-shadow:         3px 3px 5px 6px #ccc;
+  }
+  
+  .tablewidth{
+	width: 305px;
+	}
+  
+.padding{
+padding:0px 0px;
+
+
+}  
+#container{
+  width: 305px;
+  padding: 0 0 0 15px;
+  float: right;
+  font-family: Helvetica;
+  font-size: 1.2em;
+  
+}
+ 
+ 
+ #map_container {
+  width: 640px;
+    float: left;
+}
+#data_container {
+  width: 305px;
+  padding: 0 0 0 15px;
+  float: right;
+  font-family: Helvetica;
+  font-size: 1.2em;
+  
+}
+
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, textarea, p, blockquote, th, td {
+margin: 5px;
+padding: 5px;
+
+}
+
+
+
+#map_canvas {
+  width: 638px;
+  height: 598px;
+  border: 1px solid #222222;
+  
+}
+
+#map_footer {
+  margin-top: 15px;
+  font-size: 1.2em;
+}
+#pagerOne {
+  width: 638px;
+  height: 598px;
+  border: 1px solid #222222;
+  
+}
+
+
+.separator h2 {
+  margin: 0 0 15px 0;
+  padding: 0.6em 0;
+  text-align: center;
+}
+.separator h1, .separator h2, .separator h3, .separator h4 {
+background-color: #222;
+color: white;
+font-size: 1.6em;
+margin: 0.8em 0;
+padding: 0.6em;
+}
+
+
+
+
+
+#dataTable {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 1.em;
+  margin: 0.5em 0;
+  width: 100%;
+  font: 12px
+  }
+  
+  th.headerSortUp { 
+; 
+    background-color: #3399FF; 
+} 
+th.headerSortDown { 
+    background-image: url(../img/small_desc.gif); 
+    background-color: #3399FF; 
+} 
+
+th.header { 
+    background-image: url(../img/small.gif);     
+    cursor: pointer; 
+    font-weight: bold; 
+    background-repeat: no-repeat; 
+    background-position: center left; 
+    padding-left: 20px; 
+    border-right: 1px solid #dad9c7; 
+    margin-left: -1px; 
+} 
+
+.pager {
+
+  margin: 5px 0;
+
+}
+
+
+.pagerButton {
+
+  margin: 0 3px 0 0;
+
+  font-size: 12px;
+
+  padding: 2px;
+
+  font-family: Helvetica, Arial, sans-serif;
+
+  font-weight: bold;
+
+}
+
+
+
+.pagerNumber {
+
+  margin: 0 3px 0 0;
+
+  text-align: center;
+
+  font-size: 12px;
+
+  padding: 2px;
+
+}
+
+
+
+.legend {
+
+  background-color: white;
+
+  border: 1px solid #ABABAB;
+
+  margin: 0 0 0 5px;
+
+  padding: 5px 10px;
+
+  text-align: center;
+
+  font-size: 12px;
+
+}
+
+
+
+.legend_row {
+
+  height:15px;
+
+  margin-bottom: 3px;
+
+}
+
+
+
+.legend_text {
+
+  line-height: 15px;
+
+  padding-left: 5px;
+
+}
+
+.even{
+background-color: #EEE;
+}
+
+.odd{
+	#separator 
+	width: 20px;
+}
+
+
+
+/* table Style*/
+table.tablesorter {
+	font-family:arial;
+	background-color: #CDCDCD;
+	margin:10px 0pt 15px;
+	font-size: 8pt;
+	width: 100%;
+	text-align: left;
+}
+table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+	background-color: #e6EEEE;
+	border: 1px solid #FFF;
+	font-size: 8pt;
+	padding: 16px;
+	
+}
+table.tablesorter thead tr .header {
+	background-image: url(bg.gif);
+	background-repeat: no-repeat;
+	background-position: center right;
+	cursor: pointer;
+}
+table.tablesorter tbody td {
+	color: #3D3D3D;
+	padding: 4px;
+	background-color: #FFF;
+	vertical-align: top;
+}
+table.tablesorter tbody tr.odd td {
+	background-color:#F0F0F6;
+}
+table.tablesorter thead tr .headerSortUp {
+	background-image: url(asc.gif);
+}
+table.tablesorter thead tr .headerSortDown {
+	background-image: url(desc.gif);
+}
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+background-color: #8dbdd8;
+}
+
+element.style {
+width: 186px;
+}
+
+tr.odd {background:#ECF6FC;}
