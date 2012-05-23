@@ -1,26 +1,21 @@
+<!DOCTYPE html>
 <html>
 <head>
-<link href="style.css" rel="stylesheet" type="text/css" media="print, projection, screen">
-<a href="./"></a>
-
-	<script type="text/javascript" src="jquery-1.7.2.js"></script>
-	<script type="text/javascript" src="jquery.tablesorter.min.js"></script>
-	<script type="text/javascript" src="jquery.tablesorter.pager.js"></script>
-	
-	<script type="text/javascript"
-      src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAKBhckwI0gXKTqrhCp-1cPDvQn8VyG2to&sensor=false">
-    </script>
-<!-- tablesorter specific links that may not be necessary-->
-<link rel="stylesheet" href="css/jq.css" type="text/css" media="print, projection, screen"><link/>
-
-
+<link href="css/style.css" rel="stylesheet" type="text/css" media="print, projection, screen">
+	<script type="text/javascript" src="js/jquery-1.7.2.js"></script>
+	<script type="text/javascript" src="js/jquery.tablesorter.js"></script>
+	<script type="text/javascript" src="js/jquery.tablesorter.pager.js"></script>
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAKBhckwI0gXKTqrhCp-1cPDvQn8VyG2to&sensor=false"></script>
 <script type="text/javascript">
 
 	var testObj;
 	var selectedLayer;
 	var map;
-	var tableID='3658733';
-	
+	var tableID='4011903';
+	var baseLayer;
+	google.load('visualization', '1.0', {'packages':['corechart']});
+
 	$(document).ready(function() { 
 	createMap();
 	$("#csvsort") 
@@ -35,9 +30,18 @@
 		
 		getSelectedLayer(dID);
 		});
-	
-	
-}); 
+	$('#resetZoom').click(function(){
+		createMap();
+		e.preventDefault();
+	});
+	$('#map_change').change(function(){
+		var selected = $(this).attr('value');
+		console.log(selected);
+		baseLayer.setMap(null);
+		getBaseLayer(selected);
+		
+	})
+	}); 
 
 function createMap(){
  var myOptions = {
@@ -48,21 +52,56 @@ function createMap(){
 
   map = new google.maps.Map(document.getElementById('map_canvas'),
       myOptions);
- var baseLayer = new google.maps.FusionTablesLayer({
+ getBaseLayer('Asian');
+}
+function getBaseLayer(col){
+
+baseLayer = new google.maps.FusionTablesLayer({
   query: {
     select: 'geometry',
     from: tableID
-	}
+	},
+	styles:[
+		{
+    polygonOptions: {
+      fillColor: "#333333",
+      fillOpacity: 0.2,
+      strokeOpacity:0.1,
+      strokeWeight:"0"
+    }
+  },
+		{
+		where: "'"+col + "' > 0",
+		polygonOptions:{
+			fillColor:"#FF0000",
+			strokeColor:"#FF0000",
+			strokeWeight:"1",
+			fillOpacity:0.5,
+			strokeOpacity:0.5
+		}},
+		{where:  "'"+col + "' < 0",
+		polygonOptions:{
+			fillColor:"#0000FF",
+			strokeColor:"#333333",
+			strokeWeight:"1"
+		
+		}}]
+	});
+google.maps.event.addListener(baseLayer,'click',function(event){
+	
+	testObj = event;
+	getSelectedLayer(event.row.GEOID10.value);
 });
-
 baseLayer.setMap(map);
+	
 }
 
 function getSelectedLayer(dID){
-console.log(typeof(dID));
-if(typeof selectedLayer != 'undefined'){
-	selectedLayer.setMap(null);
-}
+	console.log(dID);
+	if(typeof selectedLayer != 'undefined'){
+		selectedLayer.setMap(null);
+		alert('null');
+	}
  
 
 	
@@ -76,26 +115,36 @@ selectedLayer = new google.maps.FusionTablesLayer({
   styles:[{
 	polygonOptions:{
 		fillOpacity:0.1,
-		strokeColor:"#FF0000",
-		strokeWeight:3
+		strokeColor:"#D9D919",
+		strokeWeight:3,
+		strokeOpacity:0.5
 	}
 	}]
 	});
 	
 selectedLayer.setMap(map);
+
 getCenter(dID);
 }
 
 function getCenter(dID){
-console.log("Hello");
-var base_url = 'https://www.google.com/fusiontables/api/query';
-var sql ='SELECT LAT FROM "'+ tableID +'"';
+//USE google viz
+var queryText = encodeURIComponent("SELECT LAT, LON FROM " + tableID + " WHERE GEOID10 = " + dID);
+var query = new google.visualization.Query(
+            'http://www.google.com/fusiontables/gvizdata?tq='  + queryText);
+query.send(function(response){
+	var numRows = response.getDataTable().getNumberOfRows();
 
-$.get(base_url,{'sql':sql},function(data){
-	
-	testObj = data;
-}, "text");
-
+          //create the list of lat/long coordinates
+          var coordinates = [];
+          for(i = 0; i < numRows; i++) {
+            var lat = response.getDataTable().getValue(i, 0);
+            var lng = response.getDataTable().getValue(i, 1);
+            coordinates.push(new google.maps.LatLng(lat, lng));
+          }
+          map.setCenter(coordinates[0]);
+          map.setZoom(10);  
+})
 
 }
 
@@ -107,38 +156,45 @@ $.get(base_url,{'sql':sql},function(data){
 
 <!-- BEGIN MAP ***********************************************************************************************-->
 
-<div id="map_container" width="1340" height="2452" >
+
 
 <!--This drop down menu should be populated with ethnicities that reflect our dataset-->
 <span style="font-size: 16px;"><strong>SELECT MAP:</strong></span> 
 <select id="map_change">
 
-		<option value="total">PctBW</option>
-		<option value="total">American Indian or Alaska Native</option>
-		<option value="total">Asian Combined</option>
-		<option value="total">Asian or Pacific Islander</option>
-		<option value="total">Asian</option>
-		<option value="total">Hawaiian/ Pacific Islander</option>
-		<option value="total">Hispanic</option>
-		<option value="total">Black</option>
-		<option value="total">White</option>
-		<option value="total">Two or more races</option>
+		<option value="All B-W %">Percent Black</option>
+		<option value="Native American/Alaskan">American Indian or Alaska Native</option>
+		<option value="Asian Combined">Asian Combined</option>
+		<option value="Asian Pacific Islander">Asian or Pacific Islander</option>
+		<option value="Asian">Asian</option>
+		<option value="Hawaiian Pacific Islander">Hawaiian/ Pacific Islander</option>
+		<option value="Hispanic">Hispanic</option>
+		<option value="African American">Black</option>
+		<option value="White">White</option>
+		<option value="Total">Two or more races</option>
 	
 </select>
-<a  style="font-size: 16px;" href="javascript:void(0);" id="resetZoom">Center map/Reset zoom</a>
+<input type="button" value='Center map/Reset zoom' id="resetZoom"/>
 <div id='map_canvas' style='width:800px;height:600px'>
 </div>
-<!--
-<iframe  width="800" height="598" scrolling="no"  src="https://www.google.com/fusiontables/embedviz?viz=MAP&q=select+col2%3E%3E1+from+3658733+&h=false&lat=37.41802175793486&lng=-119.30660699999999&z=7&t=1&l=col2%3E%3E1"></iframe>  
--->
+
 <!-- END MAP ***********************************************************************************************-->
 
-<!--Buttons to navigate through the data tables these may not be necessary with our dataset-->
-<input type="submit" class="first pagerButton" value="First" />
-<input type="submit" class="prev pagerButton" value="Previous" />
-<input type="text" size="4"  class="pagedisplay pagerNumber" />
-<input type="submit" class="next pagerButton" value="Next" />
-<input type="submit" class="last pagerButton" value="Last" />
+<div id="pager" class="pager" >
+	<form>
+		<img src="first.png" class="first">
+		<img src="prev.png" class="prev">
+		<input type="text" class="pagedisplay">
+		<img src="next.png" class="next">
+		<img src="last.png" class="last">
+		<select class="pagesize">
+			<option selected="selected" value="10">10</option>
+			<option value="20">20</option>
+			<option value="30">30</option>
+			<option value="40">40</option>
+		</select>
+	</form>
+</div>
 
 
 <!-- BEGIN GOOGLE TABLE ***********************************************************************************************-->
@@ -226,21 +282,7 @@ $.get(base_url,{'sql':sql},function(data){
 </table>
 <!-- THIS IS THE END OF THE FOOTER IN THE TABLE  ****************** -->
 
-<div id="pager" class="pager" >
-	<form>
-		<img src="first.png" class="first">
-		<img src="prev.png" class="prev">
-		<input type="text" class="pagedisplay">
-		<img src="next.png" class="next">
-		<img src="last.png" class="last">
-		<select class="pagesize">
-			<option selected="selected" value="10">10</option>
-			<option value="20">20</option>
-			<option value="30">30</option>
-			<option value="40">40</option>
-		</select>
-	</form>
-</div>
+
 
 
 
