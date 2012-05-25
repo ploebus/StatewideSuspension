@@ -12,7 +12,7 @@
 	var testObj;
 	var selectedLayer;
 	var map;
-	var tableID='4011903';
+	var tableID='4032850';
 	var baseLayer;
 	google.load('visualization', '1.0', {'packages':['corechart']});
 
@@ -39,6 +39,7 @@
 		console.log(selected);
 		baseLayer.setMap(null);
 		getBaseLayer(selected);
+		addLegend();
 		
 	})
 	}); 
@@ -52,7 +53,7 @@ function createMap(){
 
   map = new google.maps.Map(document.getElementById('map_canvas'),
       myOptions);
- getBaseLayer('Asian');
+ getBaseLayer('All_PctBW');
 }
 function getBaseLayer(col){
 
@@ -62,91 +63,144 @@ baseLayer = new google.maps.FusionTablesLayer({
     from: tableID
 	},
 	styles:[
+		
 		{
-    polygonOptions: {
-      fillColor: "#333333",
-      fillOpacity: 0.2,
-      strokeOpacity:0.1,
-      strokeWeight:"0"
-    }
-  },
-		{
-		where: "'"+col + "' > 0",
+		where: "'"+ col + "' < -0.10",
+		polygonOptions:{
+			fillColor:"#2C7BB6",
+			strokeColor:"#333333",
+			strokeWeight:"1",
+			fillOpacity:1,
+			strokeOpacity:1
+		}},
+		{where:  "'"+col + "' < 0 AND '" + col + "'>-0.10",
+		polygonOptions:{
+			fillColor:"#ABD9E9",
+			strokeColor:"#333333",
+			strokeWeight:"1",
+			fillOpacity:0.5
+			
+		
+		}},
+		{where:  "'"+col + "' = 0",
+		polygonOptions:{
+			fillColor:"#333333",
+			strokeColor:"#333333",
+			strokeWeight:"1",
+			fillOpacity:0.1,
+			strokeOpacity:.2
+			
+		
+		}},
+		{where:  "'"+col + "' > 0 AND '" + col + "'< 0.14",
+		polygonOptions:{
+			fillColor:"#FDAE61",
+			strokeColor:"#333333",
+			strokeWeight:"1",
+			fillOpacity:0.5
+			
+		
+		}},
+		{where:  "'"+col + "' > 0.14",
 		polygonOptions:{
 			fillColor:"#FF0000",
-			strokeColor:"#FF0000",
-			strokeWeight:"1",
-			fillOpacity:0.5,
-			strokeOpacity:0.5
-		}},
-		{where:  "'"+col + "' < 0",
-		polygonOptions:{
-			fillColor:"#0000FF",
 			strokeColor:"#333333",
-			strokeWeight:"1"
-		
-		}}]
+			strokeWeight:"1",
+			fillOpacity:1
+		}}
+					
+		]
 	});
 google.maps.event.addListener(baseLayer,'click',function(event){
-	
 	testObj = event;
+	console.log(event.row.GEOID10.value);
 	getSelectedLayer(event.row.GEOID10.value);
+	
 });
 baseLayer.setMap(map);
 	
 }
 
 function getSelectedLayer(dID){
+	
 	console.log(dID);
-	if(typeof selectedLayer != 'undefined'){
+	if(typeof(selectedLayer) != 'undefined'){
 		selectedLayer.setMap(null);
-		alert('null');
-	}
+		
+	};
  
 
-	
+console.log(dID);
 //create layer with sql filter and unique style
 selectedLayer = new google.maps.FusionTablesLayer({
   query: {
-    select: 'geometry',
-    from: tableID,
-	where: "GEOID10 ='" + dID + "'"
-  },
-  styles:[{
-	polygonOptions:{
-		fillOpacity:0.1,
-		strokeColor:"#D9D919",
-		strokeWeight:3,
-		strokeOpacity:0.5
-	}
-	}]
+    select: "'geometry'",
+    from: 	'4033559' ,
+	where: "'GEOID10' contains '" + dID +"'"
+  }
 	});
-	
+//baseLayer.setMap(null);	
 selectedLayer.setMap(map);
-
 getCenter(dID);
+var infowindow;
+google.maps.event.addListener(selectedLayer,'click',function(){
+	infowindow = new google.maps.InfoWindow({
+		content:"hello"
+	})
+});
+google.maps.event.addListener(infowindow,'closeclick',function(){
+	selectedLayer.setMap(null);
+});
+
+
+//baseLayer.setMap(null);
+
+
+}
+
+function addLegend(){
+	 var legendWrapper = document.createElement('div');
+        legendWrapper.id = 'legendWrapper';
+        legendWrapper.index = 1;
+        map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(
+        legendWrapper);
+
+
 }
 
 function getCenter(dID){
 //USE google viz
-var queryText = encodeURIComponent("SELECT LAT, LON FROM " + tableID + " WHERE GEOID10 = " + dID);
+console.log("got here");
+var queryText = encodeURIComponent("SELECT geometry FROM " + tableID + " WHERE GEOID10 = " + dID);
 var query = new google.visualization.Query(
             'http://www.google.com/fusiontables/gvizdata?tq='  + queryText);
 query.send(function(response){
-	var numRows = response.getDataTable().getNumberOfRows();
-
+	
+	testObj = response.getDataTable().getValue(0,0);
+	console.log(typeof testObj);
+	
+	testObj =  testObj.replace(/(<([^>]+)>)/ig,"");
+	var myArray = testObj.split(" ");
+	
+	var numRows = myArray.length;
+	var bounds = new google.maps.LatLngBounds();
+	//console.log(bounds.toString());
           //create the list of lat/long coordinates
           var coordinates = [];
-          for(i = 0; i < numRows; i++) {
-            var lat = response.getDataTable().getValue(i, 0);
-            var lng = response.getDataTable().getValue(i, 1);
-            coordinates.push(new google.maps.LatLng(lat, lng));
+          for(i = 0; i < numRows-1; i++) {
+           //console.log(myArray[i]);
+            bounds.extend(new google.maps.LatLng(myArray[i]))
+           coordinates.push(new google.maps.LatLng(myArray[i]));
           }
-          map.setCenter(coordinates[0]);
-          map.setZoom(10);  
+           map.fitBounds(bounds);
+
+          //map.setCenter(coordinates[0]);
+          //map.setZoom(10);  
 })
 
 }
+
+
 
 
 </script> 
@@ -157,16 +211,18 @@ query.send(function(response){
 <!-- BEGIN MAP ***********************************************************************************************-->
 
 
-
+<header>
+	<img src="logo.png"/>
+</header>
 <!--This drop down menu should be populated with ethnicities that reflect our dataset-->
 <span style="font-size: 16px;"><strong>SELECT MAP:</strong></span> 
 <select id="map_change">
 
-		<option value="All B-W %">Percent Black</option>
+		<option value="All_PctBW">Percent Black</option>
 		<option value="Native American/Alaskan">American Indian or Alaska Native</option>
 		<option value="Asian Combined">Asian Combined</option>
 		<option value="Asian Pacific Islander">Asian or Pacific Islander</option>
-		<option value="Asian">Asian</option>
+		<option value="ALL_Asian">Asian</option>
 		<option value="Hawaiian Pacific Islander">Hawaiian/ Pacific Islander</option>
 		<option value="Hispanic">Hispanic</option>
 		<option value="African American">Black</option>

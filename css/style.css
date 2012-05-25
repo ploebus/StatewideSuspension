@@ -84,14 +84,13 @@ padding: 0.6em;
 
 #dataTable {
   font-family: Helvetica, Arial, sans-serif;
-  font-size: 1.em;
+  font-size: 1em;
   margin: 0.5em 0;
   width: 100%;
   font: 12px
   }
   
   th.headerSortUp { 
-; 
     background-color: #3399FF; 
 } 
 th.headerSortDown { 
@@ -147,7 +146,7 @@ th.header {
 
 
 
-.legend {
+#legendWrapper {
 
   background-color: white;
 
@@ -160,6 +159,10 @@ th.header {
   text-align: center;
 
   font-size: 12px;
+  
+  height:200px;
+  
+  width:200px
 
 }
 
