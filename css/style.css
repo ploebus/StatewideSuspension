@@ -25,10 +25,7 @@ padding:0px 0px;
 }
  
  
- #map_container {
-  width: 640px;
-    float: left;
-}
+ 
 #data_container {
   width: 305px;
   padding: 0 0 0 15px;
@@ -45,10 +42,23 @@ padding: 5px;
 }
 
 
+#map_container{
+	width:1000px;
+	height:600px
+}
 
+#left_nav{
+	width:300px;
+	float:left;
+	height:90%;
+	overflow:hidden
+}
+#boxState{
+	float:right;
+}
 #map_canvas {
-  width: 638px;
-  height: 598px;
+  width: 650px;
+  height: 100%;
   border: 1px solid #222222;
   
 }

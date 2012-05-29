@@ -1,13 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<link href="css/custom-theme/jquery-ui-1.8.20.custom.css" rel="stylesheet" type="text/css" media="print, projection, screen">
-	<link href="css/style.css" rel="stylesheet" type="text/css" media="print, projection, screen">
+<link href="css/style.css" rel="stylesheet" type="text/css" media="print, projection, screen">
 	<script type="text/javascript" src="js/jquery-1.7.2.js"></script>
-	<script type="text/javascript" src="js/jquery-ui-1.8.20.custom.min.js"></script>	
-	<script type="text/javascript" src="js/johnUtils.js"></script>	
-
-	
 	<script type="text/javascript" src="js/jquery.tablesorter.js"></script>
 	<script type="text/javascript" src="js/jquery.tablesorter.pager.js"></script>
 	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -23,7 +18,6 @@
 
 	$(document).ready(function() { 
 	createMap();
-	setEvents();
 	$("#csvsort") 
 		.tablesorter({widthFixed: true, widgets: ['zebra']}) 
 		.tablesorterPager({container: $("#pager")}); 
@@ -49,42 +43,12 @@
 		
 	})
 	}); 
-function setEvents(){
-	$('#boxState').toggle(
-	function(){
-		$('#left_nav').animate({
-			width:'30px',
-			height:'30px'
-		},500,function(){
-		$('#boxState').attr('src','css/expand.png');
-		});
-		
-		$('#map_canvas').animate({
-			width:'800px'
-			}, 500);
-	},
-	function(){
-		$('#left_nav').animate({
-			width:'300px'
-		},500,function(){
-		
-		$('#boxState').attr('src','css/shrink.png');
-		});
-		
-		$('#map_canvas').animate({
-			width:'650px',
-			height:'100%'
-			}, 500);
-	});
-	
-}
 
 function createMap(){
  var myOptions = {
     zoom: 7,
     center: new google.maps.LatLng(37.41802175793486,-119.30660699999999),
-    mapTypeId: google.maps.MapTypeId.ROADMAP,
-    styles:[ { elementType: "geometry", stylers: [ { lightness: -35 }, { saturation: -32 }, { gamma: 0.45 } ] } ]
+    mapTypeId: google.maps.MapTypeId.ROADMAP
   };
 
   map = new google.maps.Map(document.getElementById('map_canvas'),
@@ -154,7 +118,7 @@ google.maps.event.addListener(baseLayer,'click',function(event){
 	
 });
 baseLayer.setMap(map);
-//addLegend();	
+	
 }
 
 function getSelectedLayer(dID){
@@ -189,7 +153,6 @@ var infowindow;
 function addLegend(){
 	 var legendWrapper = document.createElement('div');
         legendWrapper.id = 'legendWrapper';
-        legendWrapper.className = 'shadow';
         legendWrapper.index = 1;
         map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(
         legendWrapper);
@@ -205,60 +168,23 @@ var query = new google.visualization.Query(
             'http://www.google.com/fusiontables/gvizdata?tq='  + queryText);
 query.send(function(response){
 	
-	var kmlReturn = StringtoXML(response.getDataTable().getValue(0,0));
+	testObj = response.getDataTable().getValue(0,0);
+	console.log(typeof testObj);
 	
+	testObj =  testObj.replace(/(<([^>]+)>)/ig,"");
+	var myArray = testObj.split(" ");
 	
-	
-	testObj = kmlReturn.getElementsByTagName("coordinates")[0];
-	
-	
-	//console.log(testObj);
-	
-	//testObj =  testObj.replace(/(<([^>]+)>)/ig,"");
-	
-	var myArray = $(testObj).text().split(" ");
-	//console.log(myArray.length);
 	var numRows = myArray.length;
-	
-	var SWlat = 100;
-	var SWlng = -200;
-	
-	var NElat = 0;
-	var NElng = 0;
-	
-	
-		
+	var bounds = new google.maps.LatLngBounds();
 	//console.log(bounds.toString());
           //create the list of lat/long coordinates
-       
-          //var coordinates = [];
+          var coordinates = [];
           for(i = 0; i < numRows-1; i++) {
-           var tLat = myArray[i].split(",")[1];
-           var tLng = myArray[i].split(",")[0];
-           
-           if(tLat < SWlat){
-           	SWlat = tLat;
-           };
-           if(tLng > SWlng){
-           	SWlng = tLng;
-           };
-           if(tLat > NElat){
-           	NElat = tLat;
-           };
-           
-           if (tLng < NElng){
-           	NElng = tLng;
-           };
-          
-            //bounds.extend(new google.maps.LatLng(myArray[i]))
-          // coordinates.push(new google.maps.LatLng(myArray[i]));
+           //console.log(myArray[i]);
+            bounds.extend(new google.maps.LatLng(myArray[i]))
+           coordinates.push(new google.maps.LatLng(myArray[i]));
           }
-           var SWBound = new google.maps.LatLng(SWlat , SWlng);
-           var NEBound = new google.maps.LatLng(NElat , NElng);
-           
-           var bounds = new google.maps.LatLngBounds(SWBound, NEBound);
-           //console.log(SWlat + "," + SWlng + " | " + NElat + "," + NElng);
-          	map.fitBounds(bounds);
+           map.fitBounds(bounds);
 
           //map.setCenter(coordinates[0]);
           //map.setZoom(10);  
@@ -281,12 +207,7 @@ query.send(function(response){
 	<img src="logo.png"/>
 </header>
 <!--This drop down menu should be populated with ethnicities that reflect our dataset-->
-
-
-<div id="map_container">
-<div id="left_nav" class="ui-widget-content">
-<img id="boxState" src="css/shrink.png"	/>
-	SELECT MAP:
+<span style="font-size: 16px;"><strong>SELECT MAP:</strong></span> 
 <select id="map_change">
 
 		<option value="All_PctBW">Percent Black</option>
@@ -302,10 +223,9 @@ query.send(function(response){
 	
 </select>
 <input type="button" value='Center map/Reset zoom' id="resetZoom"/>
+<div id='map_canvas' style='width:800px;height:600px'>
 </div>
-<div id='map_canvas'>
-</div>
-</div>
+
 <!-- END MAP ***********************************************************************************************-->
 
 <div id="pager" class="pager" >
