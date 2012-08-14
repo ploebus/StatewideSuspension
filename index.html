@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="UTF-8"/>
 	<link href="css/custom-theme/jquery-ui-1.8.20.custom.css" rel="stylesheet" type="text/css" media="print, projection, screen">
 	<link href="css/style.css" rel="stylesheet" type="text/css" media="print, projection, screen">
 	<script type="text/javascript" src="js/jquery-1.7.2.js"></script>
@@ -12,18 +13,42 @@
 	<script type="text/javascript" src="js/jquery.tablesorter.pager.js"></script>
 	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAKBhckwI0gXKTqrhCp-1cPDvQn8VyG2to&sensor=false"></script>
-<script type="text/javascript">
+
+	<script type="text/javascript">
 
 	var testObj;
+	var testObj1;
 	var selectedLayer;
 	var map;
 	var tableID='4032850';
 	var baseLayer;
+	var selectedGeoId;
+	
+	var selectedStudentType = 'Suspension Risk All Students';
+	
 	google.load('visualization', '1.0', {'packages':['corechart']});
 
 	$(document).ready(function() { 
 	createMap();
 	setEvents();
+	$("#internalNav a").click(function(event){
+		event.preventDefault();
+		$(this).focus();
+		var selected = $(this).attr('name');
+		if(selected == 'Percentage_all'){
+			selectedStudentType = 'Suspension Risk All Students';
+			}
+		else if(selected == 'Percentage_disability'){
+			selectedStudentType = 'Suspension Risk Students with a disability';
+		}
+		else{
+			selectedStudentType = 'Suspension Risk Students without a disability';
+		}
+		console.log(selected);
+		getChart(selectedGeoId, selected);
+	
+	});
+	
 	$("#csvsort") 
 		.tablesorter({widthFixed: true, widgets: ['zebra']}) 
 		.tablesorterPager({container: $("#pager")}); 
@@ -45,7 +70,7 @@
 		console.log(selected);
 		baseLayer.setMap(null);
 		getBaseLayer(selected);
-		addLegend();
+		//addLegend();
 		
 	})
 	}); 
@@ -89,7 +114,9 @@ function createMap(){
 
   map = new google.maps.Map(document.getElementById('map_canvas'),
       myOptions);
- getBaseLayer('All_PctBW');
+	
+	
+	getBaseLayer('All_PctBW');
 }
 function getBaseLayer(col){
 
@@ -148,9 +175,20 @@ baseLayer = new google.maps.FusionTablesLayer({
 		]
 	});
 google.maps.event.addListener(baseLayer,'click',function(event){
-	testObj = event;
-	console.log(event.row.GEOID10.value);
+	
+	
+	
+	$("#selectedTitle").text(event.row.NAME10.value);
+	
+	//ZOOM TO LAYER
 	getSelectedLayer(event.row.GEOID10.value);
+	
+	//RESET CHART 
+	selectedStudentType = 'Suspension Risk All Students';
+	$('#internalNav a:eq(0)').focus();
+	//suppress infowindow event
+	event.preventDefault();
+	
 	
 });
 baseLayer.setMap(map);
@@ -159,15 +197,15 @@ baseLayer.setMap(map);
 
 function getSelectedLayer(dID){
 	
-	console.log(dID);
+	//console.log(dID);
 	if(typeof(selectedLayer) != 'undefined'){
 		selectedLayer.setMap(null);
-		
 	};
  
 
-console.log(dID);
+//console.log(dID);
 //create layer with sql filter and unique style
+//LOAD MAP LAYER BASED ON CLICK
 selectedLayer = new google.maps.FusionTablesLayer({
   query: {
     select: "'geometry'",
@@ -177,14 +215,52 @@ selectedLayer = new google.maps.FusionTablesLayer({
 	});
 //baseLayer.setMap(null);	
 selectedLayer.setMap(map);
+selectedGeoId = dID;
 getCenter(dID);
-var infowindow;
 
+getChart(dID,'Percentage_all');
 
 //baseLayer.setMap(null);
 
 
 }
+
+function getChart(dID,variable){
+//CREATE QUERY
+var queryText = "SELECT Race," + variable + " FROM 4895703 WHERE GEOID10 =" + dID;
+
+//SEND QUERY
+google.visualization.drawChart({
+        "containerId": "chartContainer",
+        "dataSourceUrl": 'http://www.google.com/fusiontables/gvizdata?tq=',
+        "query":queryText,
+        "chartType": "BarChart",
+		
+		"options": {
+			"legend":{"position":"right"},
+			"chartArea":{"width":"50%"},
+		    "title": selectedStudentType,
+			"legend":{"position":"top"},
+			"hAxis": {"title": "% Suspended","format":"%"},
+			"yAxis":{"title":"Race"},
+			"width":380,
+			"height":400
+        }
+      });
+
+//google.setOnLoadCallback(getChart);
+
+
+}
+
+
+
+  //var data = response.getDataTable();
+  //var chart = new google.visualization.PieChart(document.getElementById('left_nav'));
+  //chart.draw(data, {width: 400, height: 240, is3D: true});
+
+
+
 
 function addLegend(){
 	 var legendWrapper = document.createElement('div');
@@ -199,7 +275,7 @@ function addLegend(){
 
 function getCenter(dID){
 //USE google viz
-console.log("got here");
+
 var queryText = encodeURIComponent("SELECT geometry FROM " + tableID + " WHERE GEOID10 = " + dID);
 var query = new google.visualization.Query(
             'http://www.google.com/fusiontables/gvizdata?tq='  + queryText);
@@ -302,6 +378,13 @@ query.send(function(response){
 	
 </select>
 <input type="button" value='Center map/Reset zoom' id="resetZoom"/>
+<h3 id="selectedTitle"></h3>
+<div id="internalNav">
+<a href="#" name="Percentage_all">Total</a> | <a name="Percentage_disability" href="#">With Disability</a> | <a name="Percentage_wodisability" href="#">Without Disability<a/>
+</div>
+<div id="chartContainer">
+
+</div>
 </div>
 <div id='map_canvas'>
 </div>
@@ -336,7 +419,7 @@ query.send(function(response){
 <!-- END GOOGLE TABLE ***********************************************************************************************-->
 
 <!-- BEGIN SORT TABLE ***********************************************************************************************-->
-
+<iframe width="900" height="500" scrolling="yes" frameborder="no" src="https://www.google.com/fusiontables/embedviz?viz=GVIZ&amp;t=TABLE&amp;containerId=gviz_canvas&amp;q=select+col4%2C+col19%2C+col20%2C+col21%2C+col22%2C+col23%2C+col24%2C+col25%2C+col26%2C+col27%2C+col28%2C+col29%2C+col30+from+1ZRUDWReGrUUoFIGnjPA66n8ojx5mtssH2HC4pbI"></iframe>
 <table id="csvsort" class="tablesorter" cellspacing="1px">
 
 	<!-- <colgroup>

@@ -24,7 +24,12 @@ padding:0px 0px;
   
 }
  
+ #chartContainer{
+	height:500px;
+	width:380px;
+	margin:auto
  
+ }
  
 #data_container {
   width: 305px;
@@ -48,7 +53,7 @@ padding: 5px;
 }
 
 #left_nav{
-	width:300px;
+	width:400px;
 	float:left;
 	height:90%;
 	overflow:hidden
@@ -57,8 +62,8 @@ padding: 5px;
 	float:right;
 }
 #map_canvas {
-  width: 650px;
-  height: 100%;
+  width: 550px;
+  height: 90%;
   border: 1px solid #222222;
   
 }
