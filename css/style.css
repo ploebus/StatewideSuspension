@@ -6,26 +6,10 @@
 	box-shadow:         3px 3px 5px 6px #ccc;
   }
   
-  .tablewidth{
-	width: 305px;
-	}
-  
-.padding{
-padding:0px 0px;
 
-
-}  
-#container{
-  width: 305px;
-  padding: 0 0 0 15px;
-  float: right;
-  font-family: Helvetica;
-  font-size: 1.2em;
-  
-}
  
  #chartContainer{
-	height:500px;
+	height:420px;
 	width:380px;
 	margin:auto
  
@@ -41,32 +25,49 @@ padding:0px 0px;
 }
 
 body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, textarea, p, blockquote, th, td {
-margin: 5px;
-padding: 5px;
+
 
 }
-
+div{
+border:solid thin green;
+}
 
 #map_container{
 	width:1000px;
-	height:600px
+	height:1000px;
+	margin:auto;
+	overflow:hidden
 }
 
 #left_nav{
-	width:400px;
+	width:40%;
 	float:left;
-	height:90%;
+	height:600px;
 	overflow:hidden
+}
+
+#right_box{
+	width: 50%;
+	height: 600px;
+	float:left;
 }
 #boxState{
 	float:right;
 }
-#map_canvas {
-  width: 550px;
-  height: 90%;
-  border: 1px solid #222222;
-  
+
+
+#legendWrapper {
+	background-color: white;
+	text-align: center;
+	font-size: 12px;
+	height:160px;
+    width:100%
 }
+
+#map_canvas {
+  width: 100%;
+  height: 420px;
+ }
 
 #map_footer {
   margin-top: 15px;
@@ -156,48 +157,6 @@ th.header {
   font-size: 12px;
 
   padding: 2px;
-
-}
-
-
-
-#legendWrapper {
-
-  background-color: white;
-
-  border: 1px solid #ABABAB;
-
-  margin: 0 0 0 5px;
-
-  padding: 5px 10px;
-
-  text-align: center;
-
-  font-size: 12px;
-  
-  height:200px;
-  
-  width:200px
-
-}
-
-
-
-.legend_row {
-
-  height:15px;
-
-  margin-bottom: 3px;
-
-}
-
-
-
-.legend_text {
-
-  line-height: 15px;
-
-  padding-left: 5px;
 
 }
 
