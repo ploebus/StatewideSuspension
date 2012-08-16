@@ -62,10 +62,11 @@
 		
 		getSelectedLayer(dID);
 		});
-	$('#resetZoom').click(function(){
+	/*$('#resetButton').click(function(){
+		console.log('reset');
 		createMap();
 		e.preventDefault();
-	});
+	});*/
 	$('#map_change').change(function(){
 		var selected = $(this).attr('value');
 		console.log(selected);
@@ -74,7 +75,12 @@
 		//addLegend();
 		
 	})
-	}); 
+	});
+function resetMap(){
+console.log('reset');
+		createMap();
+		e.preventDefault();
+}	
 function setEvents(){
 	//BOX CHANGE
 	$('#boxState').toggle(
@@ -117,7 +123,17 @@ function createMap(){
 
   map = new google.maps.Map(document.getElementById('map_canvas'),
       myOptions);
-	
+	//CREATE CONTROL
+	var resetButton = document.createElement('input');
+		resetButton.setAttribute('type','button');
+		
+		resetButton.setAttribute('id','resetButton');
+		
+		resetButton.index = '0';
+		resetButton.setAttribute('value','Reset Map');
+		resetButton.onclick = resetMap;
+		
+	map.controls[google.maps.ControlPosition.TOP_RIGHT].push(resetButton);
 	//CREATE LEGEND
 	/* var legendWrapper = document.createElement('div');
         legendWrapper.id = 'legendWrapper';
@@ -132,7 +148,7 @@ function createMap(){
 }
 
 function getBaseLayer(col){
-
+	
 //Set Correct Renderer
 	
 		//console.log (col);
@@ -143,23 +159,38 @@ function getBaseLayer(col){
 			$('#legendWrapper img').attr('src','Legend1.png');
 		}
 		baseLayer = new google.maps.FusionTablesLayer({
-		  query: {
-			select: 'geometry',
-			from: tableID,
+			query: {
+				select: 'geometry',
+				from: tableID,
 			},
+			suppressInfoWindows:true,
+			map: map,
 			styles:getRenderer(col)
 			});
-		if(col != 'All_PctBW'){
-		$('#firstCategory').attr('fill','#FF0000');
-		}
-		else{
-		$('#firstCategory').attr('fill','#2C7BB6');
-		}
-google.maps.event.addListener(baseLayer,'click',function(event){
+		
+		
 	
 	
+		
+		google.maps.event.addListener(baseLayer,'click',function(event){
+	//testObj1 = event;
+	//console.log('clicked');
 	
 	$("#selectedTitle").text(event.row.NAME10.value);
+	
+	//EXPAND LEFT_NAV
+	$('#left_nav').animate({
+			width:'300px',
+			height:'100%'
+		},500,function(){
+		
+		$('#boxState').attr('src','css/shrink.png');
+		});
+		
+		$('#map_canvas').animate({
+			width:'650px',
+			height:'70%'
+			}, 500);
 	
 	//ZOOM TO LAYER
 	getSelectedLayer(event.row.GEOID10.value);
@@ -168,10 +199,11 @@ google.maps.event.addListener(baseLayer,'click',function(event){
 	selectedStudentType = 'Suspension Risk All Students';
 	$('#internalNav a:eq(0)').focus();
 	//suppress infowindow event
-	event.preventDefault();
+	//event.preventDefault();
 	
 	
 });
+
 baseLayer.setMap(map);
 //addLegend();	
 }
@@ -232,7 +264,6 @@ google.visualization.drawChart({
         }
       });
 
-//google.setOnLoadCallback(getChart);
 
 
 }
@@ -327,12 +358,14 @@ query.send(function(response){
 	<div id="map_container">
 		<div id="header">
 		<img src="logo.png"/>
-		<p>We need to put some text here that describes the project</p>
+		
 		</div>
 
-		<div id="left_nav" class="ui-widget-content shadow">
+		<div id="left_nav">
 			<img id="boxState" src="css/shrink.png"	/>
-				SELECT MAP:
+				
+			<div id="mapSelectionBox">
+			Select a group to map
 			<select id="map_change">
 
 					<option value="All_PctBW">Percent Black</option>
@@ -349,7 +382,8 @@ query.send(function(response){
 					<option value="All_Total">Total</option>
 				
 			</select>
-			<input type="button" value='Center map/Reset zoom' id="resetZoom"/>
+			</div>
+			
 			<h3 id="selectedTitle"></h3>
 			<div id="internalNav">
 			<a href="#" name="Percentage_all">Total</a> | <a name="Percentage_disability" href="#">With Disability</a> | <a name="Percentage_wodisability" href="#">Without Disability<a/>

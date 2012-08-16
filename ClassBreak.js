@@ -59,7 +59,7 @@ if(col == 'All_PctBW'){
 		{
 		where: "'"+ col + "' <= 0.10",
 		polygonOptions:{
-			fillColor:"#FFFFB2",
+			fillColor:"#fed98e",
 			strokeColor:"#333333",
 			strokeWeight:"1",
 			fillOpacity:1,
@@ -67,7 +67,7 @@ if(col == 'All_PctBW'){
 		}},
 		{where:  "'"+col + "' <= 0.20 AND '" + col + "'>=0.11",
 		polygonOptions:{
-			fillColor:"#FECC5C",
+			fillColor:"#fe9929",
 			strokeColor:"#333333",
 			strokeWeight:"1",
 			fillOpacity:0.5
@@ -76,7 +76,7 @@ if(col == 'All_PctBW'){
 		}},
 		{where:  "'"+col + "' = 0",
 		polygonOptions:{
-			fillColor:"#333333",
+			fillColor:"#ffffd4",
 			strokeColor:"#333333",
 			strokeWeight:"1",
 			fillOpacity:0.1,
@@ -86,7 +86,7 @@ if(col == 'All_PctBW'){
 		}},
 		{where:  "'"+col + "' <= 0.30 AND '" + col + "'>= 0.21",
 		polygonOptions:{
-			fillColor:"#FD8D3C",
+			fillColor:"#d95f0e",
 			strokeColor:"#333333",
 			strokeWeight:"1",
 			fillOpacity:0.5
@@ -95,7 +95,7 @@ if(col == 'All_PctBW'){
 		}},
 		{where:  "'"+col + "' > 0.30",
 		polygonOptions:{
-			fillColor:"#E31A1C",
+			fillColor:"#993404",
 			strokeColor:"#333333",
 			strokeWeight:"1",
 			fillOpacity:1
